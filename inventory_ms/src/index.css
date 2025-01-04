@@ -44,6 +44,24 @@ th {
 tr:hover {
   @apply bg-gray-100;
 }
+
+
+.my-popup-content {
+  @apply w-6/12 m-auto p-[5px];
+  background: rgb(255, 255, 255);
+}
+.my-popup-arrow {
+  @apply text-white;
+}
+[role="tooltip"].my-popup-content {
+  @apply w-[200px] shadow-[rgba(0,0,0,0.16)_0px_0px_3px];
+}
+.my-popup-overlay {
+  background: rgba(0, 0, 0, 0.5);
+}
+[data-popup="tooltip"].my-popup-overlay {
+  background: transparent;
+}
 /* body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
