@@ -4,56 +4,39 @@ import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import axios from "axios";
+import config from "../config";
 
+const UserEditForm = ({ isEditUserPopup, setEditUserPopup,fetchRoles,fetchDepartments,roles,departments,handleEditUser }) => {
 
-const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopupOpen ,roles,departments,fetchDepartments,fetchRoles}) => {
- 
-
-  // const [roles, setRoles] = useState([]);
-  // const [departments, setDepartments] = useState([]);
-  // const [showAlert, setShowAlert] = useState(false);
-  
-
-  // const fetchRoles= async () => {
-  //   try {
-  //     const response = await axios.get(`${config.backendUrl}/role/getAllRoles`);
-  //     setRoles(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching roles:", error);
-  //     alert("Failed to fetch roles. Please try again later.");
-  //   }
-  // };
-
-  // const fetchDepartments= async () => {
-  //   try {
-  //     const response = await axios.get(`${config.backendUrl}/Department/getAllDepartments`);
-  //     setDepartments(response.data);
-  //     console.log(departments);
-  //   } catch (error) {
-  //     console.error("Error fetching Department:", error);
-  //     alert("Failed to fetch Department. Please try again later.");
-  //   }
-  // };
-
+    const user = isEditUserPopup?.user || {};
+    
   useEffect(() => {
          fetchRoles();
          fetchDepartments();
        }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+       const handleChange = (e) => {
+        const { name, value } = e.target;
+    
+        // Update nested `user` object in the state
+        setEditUserPopup({
+          ...isEditUserPopup,
+          user: {
+            ...isEditUserPopup.user,
+            [name]: value,
+          },
+        });
+      };
 
 
-   
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
   // if (name === "userLoginPassword" || name === "confirmPassword") {
-  //   if (formData.userLoginPassword !== formData.confirmPassword) {
+  //   if (user.userLoginPassword !== user.confirmPassword) {
   //     setErrorMessage("Passwords do not match");
   //   } else {
   //     setErrorMessage("");
@@ -61,6 +44,7 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
   // }
 
    
+ 
   return (
 
     //  <div className="fixed inset-0  bg-gray-900 bg-opauserCity-70 z-5 ">
@@ -68,7 +52,7 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
       
     <div className=" p-20 pt-10  bg-white rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-6 text-center">User Registration Form</h1>
-      <form onSubmit={handleAddUser}>
+      <form >
         <div className="grid grid-cols-3 gap-2 m-10">
           {/* Row 1 */}
           <div>
@@ -76,7 +60,7 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
             <input
               type="text"
               name="userFirstName"
-              value={formData.userFirstName}
+              value={user.userFirstName}
               onChange={handleChange}
               className="w-full px-1 py-1 border rounded-md  border-gray-800  "
             />
@@ -86,7 +70,7 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
             <input
               type="text"
               name="userMiddleName"
-              value={formData.userMiddleName}
+              value={user.userMiddleName}
               onChange={handleChange}
               className="w-full px-1 py-1 border rounded-md  border-gray-800 "
             />
@@ -98,7 +82,7 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
             <input
               type="text"
               name="userLastName"
-              value={formData.userLastName}
+              value={user.userLastName}
               onChange={handleChange}
               className="w-full px-1 py-1 border rounded-md  border-gray-800 "
             />
@@ -108,7 +92,7 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
             <input
               type="text"
               name="userLoginName"
-              value={formData.userLoginName}
+              value={user.userLoginName}
               onChange={handleChange}
               className="w-full px-1 py-1 border rounded-md  border-gray-800 "
             />
@@ -118,41 +102,39 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
           <div>
           <label className="block text-gray-700 font-medium mb-1">Password</label>
               <TextField
-            
                 label="Password"
                 type={showPassword ? "text" : "password"}
                 name="userLoginPassword"
-                value={formData.userLoginPassword}
+                value={user.userLoginPassword}
                 onChange={handleChange}
                 fullWidth
-               
+                
                 variant="outlined"
                 sx={{
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "#1F2937", // Default border color
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "#1F2937", // Default border color
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#1F2937", // Hover border color
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#1F2937", // Focused border color
+                      },
                     },
-                    "&:hover fieldset": {
-                      borderColor: "#1F2937", // Hover border color
+                    "& .MuiInputBase-root": {
+                      height: "33.65px",
+                      bordercolor: "#1F2937",
                     },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#1F2937", // Focused border color
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      padding: "8px",
                     },
-                  },
-                  "& .MuiInputBase-root": {
-                    height: "33.65px",
-                    bordercolor: "#1F2937",
-                  },
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    padding: "8px",
-                  },
-                  
+                    
+                    }
                   }
-                }
-                
                 InputProps={{
                   endAdornment: (
-                    <InputAdornment  position="end">
+                    <InputAdornment position="end">
                       <IconButton
                         onClick={() => setShowPassword(!showPassword)}
                         edge="end"
@@ -172,33 +154,34 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
                 label="Confirm Password"
                 type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
-                value={formData.confirmPassword}
+                value={user.confirmPassword}
                 onChange={handleChange}
                 fullWidth
                 variant="outlined"
                 error={!!errorMessage}
                 helperText={errorMessage}
                 sx={{
-                   "& .MuiOutlinedInput-root": {
-      "& fieldset": {
-        borderColor: "#1F2937", // Default border color
-      },
-      "&:hover fieldset": {
-        borderColor: "#1F2937", // Hover border color
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: "#1F2937", // Focused border color
-      },
-    },
-                  "& .MuiInputBase-root": {
-                    height: "33.65px", 
-                  },
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    padding: "6px",
-                  },
-                  
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "#1F2937", // Default border color
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#1F2937", // Hover border color
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#1F2937", // Focused border color
+                      },
+                    },
+                    "& .MuiInputBase-root": {
+                      height: "33.65px",
+                      bordercolor: "#1F2937",
+                    },
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      padding: "8px",
+                    },
+                    
+                    }
                   }
-                }
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -218,7 +201,7 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
             <input
               type="email"
               name="userEmail"
-              value={formData.userEmail}
+              value={user.userEmail}
               onChange={handleChange}
               className="w-full px-1 py-1 border rounded-md  border-gray-800 "
             />
@@ -230,7 +213,7 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
             <input
               type="text"
               name="userAddress"
-              value={formData.userAddress}
+              value={user.userAddress}
               onChange={handleChange}
               className="w-full px-1 py-1 border rounded-md  border-gray-800 "
             />
@@ -240,7 +223,7 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
             <input
               type="text"
               name="userMobile"
-              value={formData.userMobile}
+              value={user.userMobile}
               onChange={handleChange}
               className="w-full px-1 py-1 border rounded-md  border-gray-800 "
             />
@@ -251,11 +234,11 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
             <label className="block text-gray-700 font-medium mb-1">Gender</label>
             <select
               name="userGender"
-              value={formData.userGender}
+              value={user.userGender}
               onChange={handleChange}
               className="w-full px-1 py-1 border rounded-md  border-gray-800 "
             >
-              <option value="">Select Gender</option>
+              <option value="">{user.userGender}</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
               <option value="Other">Other</option>
@@ -266,7 +249,7 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
             <input
               type="text"
               name="userStatus"
-              value={formData.userStatus}
+              value={user.userStatus}
               onChange={handleChange}
               className="w-full px-1 py-1 border rounded-md  border-gray-800 "
             />
@@ -274,43 +257,66 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
 
           {/* Row 6 */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1">Role</label>
-            <select
-              name="role"
-              value={formData.role.roleId || ''}
-              onChange={(e) => {
-                const selectedRole = roles.find((role) => role.roleId === parseInt(e.target.value));
-                setFormData({ ...formData, role: selectedRole });
-              }}
-              className="w-full px-1 py-1 border rounded-md  border-gray-800 "
-            >
-              <option value="">Select Role</option>
-              {roles.map((role)=>
-                
-                  <option key={role.roleId} value={role.roleId} >{role.roleName}</option>
-              )}
-              
-            </select>
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Department</label>
-            <select
-               name="department"
-               value={formData.department.deptId || ''}
-               onChange={(e) => {
-                 const selectedDepartment = departments.find((dept) => dept.deptId === parseInt(e.target.value));
-                 setFormData({ ...formData, department: selectedDepartment });
-               }}
-              className="w-full px-1 py-1 border rounded-md  border-gray-800 "
-            >
-              <option value="">Select Department</option>
-              {departments.map((dept)=>
-                
-                  <option key={dept.deptId} value={dept.deptId}>{dept.deptName}</option>
-              )}
-              
-            </select>
-          </div>
+  <label className="block text-gray-700 font-medium mb-1">Role</label>
+  <select
+    name="role"
+    value={user.role?.roleId || ""}
+    onChange={(e) => {
+      const selectedRole = roles.find((role) => role.roleId === parseInt(e.target.value));
+      setEditUserPopup({
+        ...isEditUserPopup,
+        user: {
+          ...isEditUserPopup.user,
+          role: selectedRole, // Update the role object with the selected role
+        },
+      });
+    }}
+    className="w-full px-1 py-1 border rounded-md border-gray-800"
+  >
+    <option value="" disabled>
+      {user.role?.roleName || "Select Role"}
+    </option>
+    {roles.map((role) => (
+      <option key={role.roleId} value={role.roleId}>
+        {role.roleName}
+      </option>
+    ))}
+  </select>
+</div>
+
+
+{
+    ///department
+}
+
+<div>
+  <label className="block text-gray-700 font-medium mb-1">Department</label>
+  <select
+    name="department"
+    value={user.department?.deptId || ""}
+    onChange={(e) => {
+      const selectedDept = roles.find((dept) => dept.deptId === parseInt(e.target.value));
+      setEditUserPopup({
+        ...isEditUserPopup,
+        user: {
+          ...isEditUserPopup.user,
+          department: selectedDept, // Update the role object with the selected role
+        },
+      });
+    }}
+    className="w-full px-1 py-1 border rounded-md border-gray-800"
+  >
+    <option value="" disabled>
+      {user.department?.deptName || "Select Department"}
+    </option>
+    {departments.map((dept) => (
+      <option key={dept.deptId} value={dept.deptId}>
+        {dept.deptName}
+      </option>
+    ))}
+  </select>
+</div>
+          
 
           {/* Row 7 */}
           <div>
@@ -318,7 +324,7 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
             <input
               type="text"
               name="userCity"
-              value={formData.userCity}
+              value={user.userCity}
               onChange={handleChange}
               className="w-full px-1 py-1 border rounded-md  border-gray-800 "
             />
@@ -328,7 +334,7 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
             <input
               type="text"
               name="userState"
-              value={formData.userState}
+              value={user.userState}
               onChange={handleChange}
               className="w-full px-1 py-1 border rounded-md  border-gray-800  "
             />
@@ -340,7 +346,7 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
             <input
               type="text"
               name="userZipCode"
-              value={formData.userZipCode}
+              value={user.userZipCode}
               onChange={handleChange}
               className="w-full px-1 py-1 border rounded-md  border-gray-800 "
             />
@@ -350,23 +356,29 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
             <input
               type="text"
               name="userCountry"
-              value={formData.userCountry}
+              value={user.userCountry}
               onChange={handleChange}
               className="w-full px-1 py-1 border rounded-md  border-gray-800 "
             />
           </div>
 
           {/* Row 9 */}
+         
           <div>
-            <label className="block text-gray-700 font-medium mb-1">Date of Birth</label>
-            <input
-              type="date"
-              name="userDateOfBirth"
-              value={formData.userDateOfBirth}
-              onChange={handleChange}
-              className="w-full px-1 py-1 border-solid border rounded-md  border-gray-800 "
-            />
-          </div>
+  <label className="block text-gray-700 font-medium mb-1">Date of Birth</label>
+  <input
+    type="date"
+    name="userDateOfBirth"
+    value={
+      user.userDateOfBirth
+        ? new Date(user.userDateOfBirth).toISOString().split("T")[0]
+        : ""
+    }
+    onChange={handleChange}
+    className="w-full px-1 py-1 border-solid border rounded-md border-gray-800"
+  />
+</div>
+
         </div>
 
         {/* Submit Button */}
@@ -374,14 +386,14 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
         <button
             type="submit"
             className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 mr-4"
-             onClick={() => setIsAddPopupOpen(false)}
+             onClick={() => setEditUserPopup(false)}
           >
             Back
           </button>
           <button
             type="submit"
             className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-            
+            onClick={handleEditUser}
           >
             Register
           </button>
@@ -394,4 +406,4 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
 };
   
 
-export default UserRegistrationForm;
+export default UserEditForm;

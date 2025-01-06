@@ -5,6 +5,8 @@ import axios from "axios";
 import config from "../config";
 import styled from "styled-components";
 import UserRegistrationForm from "../components/UserRegistrationForm";
+import UserView from "../components/UserView";
+import UserEditForm from "../components/UserEditForm";
 
 
 const User = () => {
@@ -24,18 +26,57 @@ const User = () => {
     useEffect(() => {
       fetchUsers();
     }, []);
-  
-    const [newUser, setNewUser] = useState({
+
+    const [formData, setFormData] = useState({
       userFirstName: "",
       userMiddleName: "",
       userLastName: "",
-      userMobile: "",
+      userLoginName: "",
+      userLoginPassword: "",
       userEmail: "",
+      userAddress: "",
+      userMobile: "",
+      userGender: "",
+      userStatus: "",
+      role: { roleId: '', roleName: '' },
+      department: { deptId: '', deptName: '' },
+      userCity: "",
+      userState: "",
+      userZipCode: "",
+      userCountry: "",
+      userDateOfBirth: "",
     });
+  
+    
     const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
-    const [editUserPopup, setEditUserPopup] = useState({ isOpen: false, user: null });
-    const [viewUserPopup, setViewUserPopup] = useState({ isOpen: false, user: null });
+    const [isEditUserPopup, setEditUserPopup] = useState({ isOpen: false, user: null });
+    const [isViewUserPopup, setViewUserPopup] = useState({ isOpen: false, user: null });
     const [showAlert, setShowAlert] = useState(false);
+
+     const [roles, setRoles] = useState([]);
+      const [departments, setDepartments] = useState([]);
+      
+    
+      const fetchRoles= async () => {
+        try {
+          const response = await axios.get(`${config.backendUrl}/role/getAllRoles`);
+          setRoles(response.data);
+        } catch (error) {
+          console.error("Error fetching roles:", error);
+          alert("Failed to fetch roles. Please try again later.");
+        }
+      };
+    
+      const fetchDepartments= async () => {
+        try {
+          const response = await axios.get(`${config.backendUrl}/Department/getAllDepartments`);
+          setDepartments(response.data);
+          console.log(departments);
+        } catch (error) {
+          console.error("Error fetching Department:", error);
+          alert("Failed to fetch Department. Please try again later.");
+        }
+      };
   
     const deleteUser = async (userId) => {
       try {
@@ -46,30 +87,69 @@ const User = () => {
         alert("Failed to delete user. Please try again.");
       }
     };
-  
-    const handleAddUser = async () => {
+  const handleAddUser = async () => {
       try {
-        await axios.post(`${config.backendUrl}/User//addUser`, newUser);
-        setNewUser({
+        const response = await axios.post(`${config.backendUrl}/User/addUser`, {
+          userFirstName: formData.userFirstName,
+          userMiddleName: formData.userMiddleName,
+          userLastName: formData.userLastName,
+          userLoginName: formData.userLoginName,
+          userLoginPassword: formData.userLoginPassword,
+          userEmail: formData.userEmail,
+          userAddress: formData.userAddress,
+          userMobile: formData.userMobile,
+          userGender: formData.userGender,
+          userStatus: formData.userStatus,
+          role: { roleId: formData.role.roleId, roleName: formData.role.roleName },
+          department: { deptId: formData.department.deptId , deptName: formData.department.deptName },
+          userCity: formData.userCity,
+          userState: formData.userState,
+          userZipCode: formData.userZipCode,
+          userCountry: formData.userCountry,
+          userDateOfBirth: formData.userDateOfBirth,
+  
+        });
+        const addedUser = response.data;
+        // console.log(formData);
+  
+        // Update the designations state with the newly added role
+        setFormData([...users, addedUser]);
+  
+        // Reset the form and close the popup
+        setFormData({
           userFirstName: "",
           userMiddleName: "",
           userLastName: "",
-          userMobile: "",
+          userLoginName: "",
+          userLoginPassword: "",
           userEmail: "",
+          userAddress: "",
+          userMobile: "",
+          userGender: "",
+          userStatus: "",
+          role: { roleId: '', roleName: '' },
+          department: { deptId: '', deptName: '' },
+          userCity: "",
+          userState: "",
+          userZipCode: "",
+          userCountry: "",
+          userDateOfBirth: "",
         });
         setIsAddPopupOpen(false);
-        fetchUsers();
+        // fetchdesignations();
+  
+        // Show success alert
         setShowAlert(true);
-        setTimeout(() => setShowAlert(false), 3000);
+        setTimeout(() => setShowAlert(false), 3000); // Hide alert after 3 seconds
       } catch (error) {
-        console.error("Error adding user:", error);
-        alert("Failed to add user. Please try again.");
+        console.error("Error adding Designation:", error);
+        alert("Failed to add Designation. Please try again.");
       }
     };
   
     const handleEditUser = async () => {
       try {
-        await axios.put(`${config.backendUrl}/User/updateUser/${editUserPopup.user.userId}`, editUserPopup.user);
+        await axios.put(`${config.backendUrl}/User/updateUser/${isEditUserPopup.user.userId}`, isEditUserPopup.user);
         setEditUserPopup({ isOpen: false, user: null });
         fetchUsers();
       } catch (error) {
@@ -80,7 +160,7 @@ const User = () => {
   
     return (
       <>
-        <div className="relative mt-8">
+        <div className="relative mt-10 ">
           {showAlert && (
             <div className="absolute top-3 left-1/2 transform -translate-x-1/2 w-1/3 z-50">
               <div
@@ -102,8 +182,8 @@ const User = () => {
               </div>
             </div>
           )}
-          <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
-            <h1 className="text-xl font-bold mb-4">User Management</h1>
+          <div className="max-w-5xl mx-auto bg-white rounded-lg shadow-md p-6 ">
+            <h1 className="text-xl font-bold mb-6">User Management</h1>
             <table className="w-full">
               <thead>
                 <tr>
@@ -122,14 +202,20 @@ const User = () => {
                     <td className="border px-4 py-2">{user.userMobile}</td>
                     <td className="border px-4 py-2">{user.userEmail}</td>
                     <td className="border px-4 py-2 space-x-2">
+                    <button
+                        className="view"
+                        onClick={() => setViewUserPopup({ isOpen: true, user })}
+                      >
+                        View
+                      </button>
                       <button
-                        className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                        className="edit"
                         onClick={() => setEditUserPopup({ isOpen: true, user })}
                       >
                         Edit
                       </button>
                       <button
-                        className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                       className="delete"
                         onClick={() => deleteUser(user.userId)}
                       >
                         Delete
@@ -159,34 +245,64 @@ const User = () => {
   arrowClassName="my-popup-arrow"
 >
   <div className="p-6 rounded-lg shadow-md w-[40rem] max-h-[80vh] overflow-y-auto bg-white">
-    <h2 className="text-lg font-bold mb-4">Add New User</h2>
+   
 
     {/* Render UserRegistration Component */}
     <UserRegistrationForm 
-      newUser={newUser} 
-      setNewUser={setNewUser} 
+      // newUser={newUser} 
+      setFormData={setFormData} 
+      formData={formData}
       handleAddUser={handleAddUser} 
+      setIsAddPopupOpen={setIsAddPopupOpen}
+      fetchRoles={fetchRoles}
+      fetchDepartments={fetchDepartments}
+      roles={roles}
+      departments={departments}
     />
 
-    {/* Buttons */}
-    <div className="flex justify-end space-x-2 mt-4">
-      <button
-        className="bg-gray-300 px-4 py-2 rounded-md hover:bg-gray-400"
-        onClick={() => setIsAddPopupOpen(false)}
-      >
-        Cancel
-      </button>
-      <button
-        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-        onClick={handleAddUser}
-      >
-        Add User
-      </button>
-    </div>
+   
   </div>
 </Popup>
-          
-        {/* Edit User Popup */}
+<Popup
+   open={isViewUserPopup.isOpen}
+   onClose={()=>setViewUserPopup.isOpen(false)}
+   modal
+   nested
+
+>
+  <div className="p-6 rounded-lg shadow-md w-[40rem] max-h-[80vh] overflow-y-auto bg-white">
+
+    <UserView
+      isViewUserPopup={isViewUserPopup}
+      setViewUserPopup={setViewUserPopup}
+
+    />
+
+  </div>
+  
+</Popup>
+          <Popup
+          open={isEditUserPopup.isOpen}
+          onClose={()=>setEditUserPopup.isOpen(false)}
+          modal
+          nested
+          >
+            <div className="p-6 rounded-lg shadow-md w-[40rem] max-h-[80vh] overflow-y-auto bg-white">
+                 <UserEditForm
+                  isEditUserPopup ={isEditUserPopup}
+                  setEditUserPopup={setEditUserPopup}
+                  fetchRoles={fetchRoles}
+                 fetchDepartments={fetchDepartments}
+                  roles={roles}
+                  departments={departments}
+                  handleEditUser={handleEditUser}
+                 />
+
+              
+
+            </div>
+          </Popup>
+        {/* Edit User Popup}
       <Popup open={editUserPopup.isOpen} onClose={() => setEditUserPopup({ isOpen: false, user: null })} modal nested>
         {editUserPopup.user && (
           <div className="p-6 rounded-lg shadow-md w-96">
@@ -249,7 +365,7 @@ const User = () => {
             </div>
           </div>
         )}
-      </Popup>
+      </Popup> */}
     </>
   );
 };

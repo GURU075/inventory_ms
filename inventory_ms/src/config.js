@@ -1,4 +1,5 @@
-const config = {
+export const config = {
+  
     backendUrl: "http://localhost:8787",
   };
   

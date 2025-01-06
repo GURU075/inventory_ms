@@ -6,9 +6,9 @@ import User from './pages/User';
 function App() {
   return (
     <div className="App">
-      <RolePage />
+      {/* <RolePage /> */}
       {/* <Designation /> */}
-      {/* <User /> */}
+      <User />
     </div>
   );
 }
