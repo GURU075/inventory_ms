@@ -9,32 +9,6 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopupOpen ,roles,departments,fetchDepartments,fetchRoles}) => {
  
 
-  // const [roles, setRoles] = useState([]);
-  // const [departments, setDepartments] = useState([]);
-  // const [showAlert, setShowAlert] = useState(false);
-  
-
-  // const fetchRoles= async () => {
-  //   try {
-  //     const response = await axios.get(`${config.backendUrl}/role/getAllRoles`);
-  //     setRoles(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching roles:", error);
-  //     alert("Failed to fetch roles. Please try again later.");
-  //   }
-  // };
-
-  // const fetchDepartments= async () => {
-  //   try {
-  //     const response = await axios.get(`${config.backendUrl}/Department/getAllDepartments`);
-  //     setDepartments(response.data);
-  //     console.log(departments);
-  //   } catch (error) {
-  //     console.error("Error fetching Department:", error);
-  //     alert("Failed to fetch Department. Please try again later.");
-  //   }
-  // };
-
   useEffect(() => {
          fetchRoles();
          fetchDepartments();
@@ -143,9 +117,21 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
                     height: "33.65px",
                     bordercolor: "#1F2937",
                   },
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    padding: "8px",
-                  },
+                 
+                 "& .MuiOutlinedInput-notchedOutline": {
+                      padding: "6px",
+                    },
+                    "& .MuiFormLabel-root": {
+                        
+                        top: "-9px", // Move the label upwards
+                        transition: "transform 0.2s ease-in-out, top 0.2s ease-in-out",
+                      },
+                      "& .MuiFormLabel-root.Mui-focused": {
+                        top: "-11px", // Adjust this value for focused state
+                        left: "10px",
+                      transform: "scale(0.75)", // Shrink the label when focused
+                     },
+                   
                   
                   }
                 }
@@ -194,8 +180,20 @@ const UserRegistrationForm = ({formData,setFormData, handleAddUser, setIsAddPopu
                     height: "33.65px", 
                   },
                   "& .MuiOutlinedInput-notchedOutline": {
-                    padding: "6px",
-                  },
+                      padding: "6px",
+                    },
+                    "& .MuiFormLabel-root": {
+                        
+                        top: "-9px", // Move the label upwards
+                        transition: "transform 0.2s ease-in-out, top 0.2s ease-in-out",
+                      },
+                      "& .MuiFormLabel-root.Mui-focused": {
+                        top: "-11px", // Adjust this value for focused state
+                        left: "10px",
+                      transform: "scale(0.75)", // Shrink the label when focused
+                     },
+                   
+               
                   
                   }
                 }

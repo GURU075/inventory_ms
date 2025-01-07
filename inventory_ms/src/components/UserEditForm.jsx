@@ -127,9 +127,19 @@ const UserEditForm = ({ isEditUserPopup, setEditUserPopup,fetchRoles,fetchDepart
                       bordercolor: "#1F2937",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
-                      padding: "8px",
+                      padding: "6px",
                     },
-                    
+                    "& .MuiFormLabel-root": {
+                        
+                        top: "-9px", // Move the label upwards
+                        transition: "transform 0.2s ease-in-out, top 0.2s ease-in-out",
+                      },
+                      "& .MuiFormLabel-root.Mui-focused": {
+                        top: "-11px", // Adjust this value for focused state
+                        left: "10px",
+                      transform: "scale(0.75)", // Shrink the label when focused
+                     },
+                   
                     }
                   }
                 InputProps={{
@@ -176,9 +186,21 @@ const UserEditForm = ({ isEditUserPopup, setEditUserPopup,fetchRoles,fetchDepart
                       height: "33.65px",
                       bordercolor: "#1F2937",
                     },
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      padding: "8px",
+                   "& .MuiOutlinedInput-notchedOutline": {
+                      padding: "6px",
                     },
+                    "& .MuiFormLabel-root": {
+                        
+                        top: "-9px", // Move the label upwards
+                        transition: "transform 0.2s ease-in-out, top 0.2s ease-in-out",
+                      },
+                      "& .MuiFormLabel-root.Mui-focused": {
+                        top: "-11px", // Adjust this value for focused state
+                        left: "10px",
+                      transform: "scale(0.75)", // Shrink the label when focused
+                     },
+                   
+                   
                     
                     }
                   }

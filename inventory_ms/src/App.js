@@ -1,4 +1,5 @@
 import './App.css';
+import Category from './pages/Category';
 import Designation from './pages/Designation';
 import RolePage from './pages/role/role';
 import User from './pages/User';
@@ -8,7 +9,8 @@ function App() {
     <div className="App">
       {/* <RolePage /> */}
       {/* <Designation /> */}
-      <User />
+      {/* <User /> */}
+      <Category />
     </div>
   );
 }
