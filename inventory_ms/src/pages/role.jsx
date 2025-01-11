@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 import axios from "axios";
-import config from "../../config";
+import config from "../config";
 
 const RolePage = () => {
   const [roles, setRoles] = useState([
