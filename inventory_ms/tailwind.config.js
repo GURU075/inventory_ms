@@ -5,22 +5,23 @@ module.exports = {
   ],
   theme: {
     extend: {
-      colors: {
-        primary: {
-          light: '#6ee7b7',
-          DEFAULT: '#34d399',
-          dark: '#059669',
+        colors: {
+          primary: {
+            light: '#6ee7b7',
+            DEFAULT: '#34d399',
+            dark: '#059669',
+          },
+          secondary: {
+            light: '#93c5fd',
+            DEFAULT: '#3b82f6',
+            dark: '#1d4ed8',
+          },
+          htiScout: '#fef08a',
         },
-        secondary: {
-          light: '#93c5fd',
-          DEFAULT: '#3b82f6',
-          dark: '#1d4ed8',
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
         },
       },
-      fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-      },
-    },
   },
   plugins: [],
 };

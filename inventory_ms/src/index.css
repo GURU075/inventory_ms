@@ -10,7 +10,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 button {
-  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 cursor-pointer;
 }
 
 button.add-role {
@@ -99,3 +99,30 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 } */
+
+.filter-grid {
+  @apply grid pl-4 pr-4 pb-6 gap-4 bg-cyan-50;
+  @apply sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7;
+}
+
+/* Input container styling */
+.filter-item {
+  @apply w-full max-w-sm min-w-[150px] relative mt-4;
+}
+
+/* Label styling */
+.filter-label {
+  @apply flex mb-2 text-sm text-slate-800;
+}
+
+/* Input field styling */
+.filter-input {
+  @apply w-full bg-white placeholder:text-slate-400 text-slate-700;
+  @apply text-sm border border-slate-600  rounded-md pl-3 pr-10 py-2;
+  @apply transition duration-300 ease-in-out;
+  @apply focus:shadow-cyan-600 focus:drop-shadow-2xl hover:border-slate-300;
+  @apply shadow-sm focus:shadow;
+}
+.thDashboard{
+  @apply bg-blue-500
+}

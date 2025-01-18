@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { httpClient } from "../../config";
 
-const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
+const AssetEdit = ({ editCategoryPopup, seteditCategoryPopup }) => {
+    const asset = editCategoryPopup?.asset || {};
     const [formData, setFormData] = useState({
         assetId: "",
         assetDesc: "",
@@ -12,24 +13,53 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
         locationId: "",
         subCategoryId: "",
         allocationType: "",
-
-
     });
     const [selectedCategory, setSelectedCategory] = useState("");
     const [categories, setCategories] = useState([]);
+    const [Category, setCategory] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
     const [location, setLocation] = useState([]);
-
-    // const [CategoryProperties, setCategoryProperties] = useState([]);
-    // const [allocationType, setAllocationType] = useState("");
-
     const [CategoryProperties, setCategoryProperties] = useState([]);
     const [categoryPropertyValues, setCategoryPropertyValues] = useState({});
     const [allocationType, setAllocationType] = useState("");
-    const [users, SetUsers] = useState([]);
+    const [users, setUsers] = useState([]);
     const [user, setUser] = useState(null);
-    const [departments, SetDepartments] = useState([]);
+    const [departments, setDepartments] = useState([]);
     const [department, setDepartment] = useState(null);
+
+
+   useEffect(()=>{
+    const updateAllocationType = async() =>{
+        try {
+            if (asset?.allocationType === "User") {
+                const response = await httpClient.get("/User/getAllUsers");
+                setUsers(response.data);
+                setAllocationType("User");
+                // console.log("Users:", users);
+            } else if (asset?.allocationType === "Group") {
+                const response = await httpClient.get("/Department/getAllDepartments");
+                setDepartments(response.data);
+                setAllocationType("Group");
+                // console.log("Departments--",departments)
+            }
+
+        } catch (error) {
+            console.error(`Error fetching data for ${asset?.allocationType}:`, error);
+            alert(`Failed to fetch ${asset?.allocationType === "User" ? "users" : "departments"}. Please try again.`);
+        }
+    }
+    updateAllocationType();
+   },[editCategoryPopup]);
+
+   useEffect(() => {
+    if (asset?.allocationType === "Group") {
+        const dep = departments.find(dept => dept?.deptId.toString() === asset?.assetAllocationTo); 
+        setDepartment(dep || null);
+    } else if (asset?.allocationType === "User") {
+        const user1 = users.find(us => us?.userId.toString() === asset?.assetAllocationTo);
+        setUser(user1 || null); 
+    }
+}, [asset?.allocationType, asset?.assetAllocationTo, users, departments]); 
 
     const handleAllocationTypeChange = async (e) => {
         const selectedType = e.target.value;
@@ -38,11 +68,11 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
         try {
             if (selectedType === "User") {
                 const response = await httpClient.get("/User/getAllUsers");
-                SetUsers(response.data);
+                setUsers(response.data);
                 console.log("Users:", users);
             } else if (selectedType === "Group") {
                 const response = await httpClient.get("/Department/getAllDepartments");
-                SetDepartments(response.data);
+                setDepartments(response.data);
             }
         } catch (error) {
             console.error(`Error fetching data for ${selectedType}:`, error);
@@ -52,7 +82,7 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
 
 
     const handleAddAsset = async (e) => {
-        
+
         try {
             const requestPayload = {
                 assetDesc: formData.assetDesc.trim(),
@@ -73,14 +103,14 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
             };
 
             const response = await httpClient.post(`/Asset/addAsset`, requestPayload);
-           const asset = response.data;
+            const asset = response.data;
 
-           console.log('asset',asset);  
-           
+            console.log('asset', asset);
+
             if (response.data) {
                 setFormData((prevFormData) => ({
                     ...prevFormData,
-                    
+
                     ...response.data,
                     assetId: response.data?.assetId || "",
                 }));
@@ -88,18 +118,18 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                 const propertyDetails = Object.entries(categoryPropertyValues).map(([key, value]) => ({
                     assetPropertyName: key,
                     assetPropertyValue: value,
-                    asset:{
-                        assetId: asset.assetId+"",
-                        },
+                    asset: {
+                        assetId: asset.assetId + "",
+                    },
                 }));
 
                 console.log('propertyDetails', propertyDetails);
-                
+
                 try {
                     // Send data to the API one by one
                     const requests = propertyDetails.map((detail) =>
                         // httpClient.post("/AssetPropertyDetail/addAssetPropertyDetail", detail)
-                    httpClient.post("/AssetDetails/addAssetDetails", detail)
+                        httpClient.post("/AssetDetails/addAssetDetails", detail)
                     );
 
                     // Wait for all requests to complete
@@ -110,7 +140,7 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                     console.error("Error submitting properties:", error);
                     alert("Failed to add some properties. Please try again.");
                 }
-                setIsAddPopupOpen(false);
+                seteditCategoryPopup(false);
             } else {
                 throw new Error("Unexpected API response structure");
             }
@@ -131,6 +161,8 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                 setCategories(categoriesRes.data);
                 setSubCategories(subCategoriesRes.data);
                 setLocation(locationsRes.data);
+
+
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -162,33 +194,6 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
     };
 
 
-
-    // const handleSubmit = async () => {
-    //     const propertyDetails = Object.entries(categoryPropertyValues).map(([key, value]) => ({
-    //         asset_property_detail_name: key,
-    //         asset_property_detail_value: value,
-    //         asset_id: assetId, // Pass the relevant asset ID here
-    //     }));
-
-    //     try {
-    //         // Send data to the API one by one
-    //         const requests = propertyDetails.map((detail) =>
-    //             httpClient.post("/CategoryProperties/addCategoryProperties", detail)
-    //         );
-
-    //         // Wait for all requests to complete
-    //         await Promise.all(requests);
-
-    //         alert("All properties added successfully!");
-    //     } catch (error) {
-    //         console.error("Error submitting properties:", error);
-    //         alert("Failed to add some properties. Please try again.");
-    //     }
-    // };
-
-
-
-
     useEffect(() => {
 
         console.log('CategoryProperties', CategoryProperties);
@@ -201,7 +206,20 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                 <div className="pr-5 w-full max-h-[80vh] overflow-y-auto  mx-auto">
                     <h2 className="text-xl font-bold mb-4 pt-6 pb-2">Add New Asset</h2>
                     <form>
+
                         <div className="grid gap-6 mb-6 grid-cols-1 sm:grid-cols-3 lg:grid-cols-2 ">
+                            <div>
+                                <label className="label-asset">Asset Id</label>
+                                <input
+                                    type="text"
+
+                                    className="input-field"
+                                    value={
+                                        asset.assetId
+                                    }
+                                    readOnly
+                                />
+                            </div>
                             <div>
                                 <label for="category" className="label-asset">Category</label>
                                 <select
@@ -227,7 +245,7 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
 
                                     required
                                 >
-                                    <option value="">-- Select Category --</option> {/* Default empty option */}
+                                    <option value="">{asset?.category?.categoryName}</option> {/* Default empty option */}
                                     {categories.map((category) => (
                                         <option key={category.categoryId} value={category.categoryId}>
                                             {category.categoryName}
@@ -244,7 +262,7 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                                     onChange={(e) => setFormData({ ...formData, subCategoryId: e.target.value })}
                                     required
                                 >
-                                    <option value="">-- Select SubCategory --</option> {/* Default empty option */}
+                                    <option value="">{asset?.subCategory?.subCategoryName}</option> {/* Default empty option */}
                                     {subCategories.map((subcategory) => (
                                         <option key={subcategory.subCategoryId} value={subcategory.subCategoryId}>{subcategory.subCategoryName}</option>
                                     ))}
@@ -264,7 +282,7 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                                     className="input-field"
                                     required
                                 >
-                                    <option value="">-- Select Allocation Type --</option>
+                                    <option value="">{asset?.allocationType}</option>
                                     <option value="Group">Group</option>
                                     <option value="User">User</option>
                                 </select>
@@ -280,9 +298,17 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                                     required
                                 >
                                     <option value="">
-                                        {allocationType === "User" ? "-- Select User --" : "-- Select Department --"}
+                                    {/* {allocationType==="User"?(user?.userFirstName):(department?.deptName)||allocationType === "User" ? "-- Select User --" : "-- Select Department --"} */}
+                                    {allocationType === "User"
+                ? user?.userFirstName
+                    ? `${user.userFirstName} ${user.userLastName}`
+                    : "-- Select User --"
+                : department?.deptName
+                    ? department.deptName
+                    : "-- Select Department --"}
+                                  
                                     </option>
-                                    {allocationType === "User" 
+                                    {allocationType === "User"
                                         ? users.map((user) => (
                                             <option key={user.userId} value={user.userId}>
                                                 {user.userFirstName + " " + user.userLastName || ""}
@@ -293,19 +319,7 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                                                 {department.deptName}
                                             </option>
                                         ))}
-                                    {/* {allocationType === "User"
-                                        ? users
-                                            .filter((user) => user && user.userLastName) // Filter out null/undefined or incomplete user objects
-                                            .map((user) => (
-                                                <option key={user.userId} value={user.userId}>
-                                                    {`${user.userFirstName} ${user.userLastName}`}
-                                                </option>
-                                            ))
-                                        : departments.map((department) => (
-                                            <option key={department.deptId} value={department.deptId}>
-                                                {department.deptName}
-                                            </option>
-                                        ))} */}
+
                                 </select>
                             </div>
 
@@ -331,7 +345,9 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                                 <label className="label-asset">Asset Description</label>
                                 <input type="text"
                                     onChange={(e) => setFormData({ ...formData, assetDesc: e.target.value })}
-                                    id="website" className="input-field" placeholder="Enter Designation" required />
+                                    id="website" className="input-field" placeholder="Enter Designation"
+                                    value={asset.assetDesc}
+                                    required />
                             </div>
 
                         </div>
@@ -384,7 +400,7 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                                             type="text"
                                             id="Department_Location"
                                             className="input-field"
-                                            value={department.location.locationName}
+                                            value={department?.location?.locationName}
                                             readOnly
                                         />
                                     </div>
@@ -396,7 +412,7 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                                             type="text"
                                             id="Department_Location"
                                             className="input-field"
-                                            value={department.floor.floorName}
+                                            value={department?.floor?.floorName}
                                             readOnly
                                         />
                                     </div>
@@ -412,7 +428,7 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                                             type="text"
                                             id="Department_Name"
                                             className="input-field"
-                                            value={user.department.deptName}
+                                            value={user?.department?.deptName}
                                             readOnly
                                         />
                                     </div>
@@ -424,7 +440,7 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                                             type="text"
                                             id="Department_Location"
                                             className="input-field"
-                                            value={user.userCity + " " + user.userState + " " + "" + user.userZipCode}
+                                            value={user?.userCity + " " + user?.userState + " " + "" + user?.userZipCode}
                                             readOnly
                                         />
                                     </div>
@@ -456,16 +472,29 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                                 </>
                             )}
                             <div>
-                                <label className="label-asset">amcStartDate</label>
-                                <input type="date"
+                                <label className="label-asset">AMC Start Date</label>
+                                <input
+                                    type="date"
                                     onChange={(e) => setFormData({ ...formData, amcStartDate: e.target.value })}
-                                    id="visitors" className="input-field" placeholder="Enter emp name" required />
+                                    id="amcStartDate"
+                                    className="input-field"
+                                    value={
+                                        formData.amcStartDate ||
+                                        (asset.amcStartDate ? new Date(asset.amcStartDate).toISOString().split('T')[0] : '')
+                                    }
+                                    required
+                                />
                             </div>
                             <div>
-                                <label className="label-asset">amcEndDate</label>
+                                <label className="label-asset">AMC End Date</label>
                                 <input type="date"
                                     onChange={(e) => setFormData({ ...formData, amcEndDate: e.target.value })}
-                                    id="visitors" className="input-field" placeholder="Enter emp name" required />
+                                    id="visitors" className="input-field" placeholder="Enter emp name"
+                                    value={
+                                        formData.amcEndDate ||
+                                        (asset.amcEndDate ? new Date(asset.amcEndDate).toISOString().split('T')[0] : '')
+                                    }
+                                    required />
                             </div>
 
                             <div>
@@ -473,13 +502,14 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                                 <select
                                     id="location"
                                     className="input-field"
-                                    onChange={(e) => setFormData({ ...formData, locationId: e.target.value })}
+                                    value={formData.locationId || asset?.location?.locationId || ""} // Show current location or edited value
+                                    onChange={(e) => setFormData({ ...formData, locationId: e.target.value })} // Update state on change
                                     required
                                 >
                                     <option value="">-- Select Location --</option>
                                     {location.map((loc) => (
-                                        <option key={loc.locationId} value={loc.locationId}>
-                                            {loc.locationName}
+                                        <option key={loc?.locationId} value={loc?.locationId}>
+                                            {loc?.locationName}
                                         </option>
                                     ))}
                                 </select>
@@ -539,7 +569,7 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
                         <div className="flex justify-end space-x-4 mb-4">
                             <button
                                 type="button"
-                                onClick={() => setIsAddPopupOpen(false)}
+                                onClick={() => seteditCategoryPopup(false)}
                                 className="bg-gray-300 text-gray-800 px-4 py-2  rounded-md hover:bg-gray-400"
                             >
                                 Cancel
@@ -561,4 +591,4 @@ const AssetAdd = ({ isAddPopupOpen, setIsAddPopupOpen }) => {
     );
 };
 
-export default AssetAdd;
+export default AssetEdit;

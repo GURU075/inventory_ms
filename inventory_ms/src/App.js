@@ -1,13 +1,17 @@
 import { element } from 'prop-types';
 import './App.css';
+
 import Asset from './pages/Asset';
 import Category from './pages/Category';
 import Designation from './pages/Designation';
 import RolePage from './pages/role';
 import User from './pages/User';
+import Login from './components/Login';
+import SignUp from './components/SignUp';
 // +import { Routes } from "react-router"
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import Sidebar from './components/Sidebar';
+import Dashboard from './pages/Dashboard';
 // import Vendor from './pages/Vendor';
 
 const router = createBrowserRouter(
@@ -15,6 +19,11 @@ const router = createBrowserRouter(
     {
       path:"/",
       element: <Sidebar/>,
+     },
+     {
+      path:"/Dashboard",
+      element: 
+      <Dashboard />,
      },
    {
     path:"/Asset",
@@ -53,8 +62,18 @@ const router = createBrowserRouter(
     element: 
     <div>
     <Sidebar/>
-    <User/>,
+    <RolePage/>,
       </div>,
+   },
+   {
+    path:"/Login",
+    element: 
+    <Login />,
+   },
+   {
+    path:"/SignUp",
+    element: 
+    <SignUp />,
    }
 
   ]

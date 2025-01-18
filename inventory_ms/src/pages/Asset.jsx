@@ -3,7 +3,8 @@ import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 import { httpClient } from "../config";
 import AssetAdd from "../components/asset/AssetAdd";
-
+import AssetView from "../components/asset/AssetView";
+import AssetEdit from "../components/asset/AssetEdit";
 const Asset = () => {
   const [assets, setAssets] = useState([
     
@@ -26,8 +27,8 @@ const Asset = () => {
 
   const [newCategory, setNewCategory] = useState({ categoryName: "", categoryDesc: "" });
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
-  const [viewPopup, setviewPopup] = useState({ isOpen: false, cat: null });
-  const [editCategoryPopup, seteditCategoryPopup] = useState({ isOpen: false, cat: null });
+  const [viewPopup, setviewPopup] = useState({ isOpen: false, asset: null });
+  const [editCategoryPopup, seteditCategoryPopup] = useState({ isOpen: false, asset: null });
   const [showAlert, setShowAlert] = useState(false);
 
   const deleteDesignation = async (assetId) => {
@@ -41,56 +42,12 @@ const Asset = () => {
 
   };
 
-//   const handleAddCat = async () => {
-//     try {
-//       const response = await httpClient.post(`/Category/addCategory`, {
-//         categoryName: newCategory.categoryName,
-//         categoryDesc: newCategory.categoryDesc,
 
-//       });
-//       const addedCat = response.data;
-
-//       // Update the assets state with the newly added role
-//       setAssets([...assets, addedCat]);
-
-//       // Reset the form and close the popup
-//       setNewCategory({
-//         categoryName: "",
-//         categoryDesc: "",
-
-//       });
-//       setIsAddPopupOpen(false);
-//       fetchassets();
-
-//       // Show success alert
-//       setShowAlert(true);
-//       setTimeout(() => setShowAlert(false), 3000); // Hide alert after 3 seconds
-//     } catch (error) {
-//       console.error("Error adding assets:", error);
-//       alert("Failed to add assets. Please try again.");
-//     }
-//   };
-
-
-//   const handleEditCat = async () => {
-//     try {
-//       await httpClient.put(`/Category/updateCategory/${editCategoryPopup.cat.categoryId}`, {
-//         categoryName: editCategoryPopup.cat.categoryName,
-//         categoryDesc: editCategoryPopup.cat.categoryDesc
-      
-//       })
-//       seteditCategoryPopup({ isOpen: false, des: null });
-//       fetchassets();
-//     } catch (error) {
-//       console.log("error editing assets", error);
-//       alert("Failed to edit assets. Please try again.");
-//     }
-//   }
 
   return (
     <>
 
-      <div className="relative mt-8">
+      <div className="relative mt-8 ">
         {showAlert &&
           <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-1/5 z-50">
             <div className="alert flex items-center p-4 mb-4 text-sm text-green-500 border border-green-300 rounded-lg bg-green-50 dark:bg-green-100 dark:text-green-400 dark:border-green-800" role="alert">
@@ -104,7 +61,7 @@ const Asset = () => {
             </div>
           </div>
         }
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
+        <div className="relative max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
           <h1 className="text-xl font-bold mb-4">Asset Management</h1>
           <table className="w-full">
             <thead>
@@ -167,6 +124,34 @@ const Asset = () => {
           <AssetAdd 
              isAddPopupOpen={isAddPopupOpen}
              setIsAddPopupOpen={setIsAddPopupOpen}
+         />
+      </div>
+
+    </Popup>
+    <Popup
+       open={viewPopup.isOpen}
+       onClose={()=>setviewPopup.isOpen(false)}
+       modal
+       nested
+    >
+       <div>
+          <AssetView
+             viewPopup={viewPopup}
+             setviewPopup={setviewPopup}
+         />
+      </div>
+
+    </Popup>
+    <Popup
+       open={editCategoryPopup.isOpen}
+       onClose={()=>seteditCategoryPopup.isOpen(false)}
+       modal
+       nested
+    >
+       <div>
+          <AssetEdit
+             editCategoryPopup={editCategoryPopup}
+             seteditCategoryPopup={seteditCategoryPopup}
          />
       </div>
 
